@@ -6,6 +6,7 @@ ec2 = session.resource('ec2')
 
 def filter_instances(project):
     instances = []
+
     if project:
         filters = [{'Name':'tag:Project','Values':[project]}]
         instances = ec2.instances.filter(Filters=filters)
@@ -15,6 +16,13 @@ def filter_instances(project):
     return instances
 
 @click.group()
+def cli():
+    """Program that manage AWS Account!"""
+
+@cli.group('volumes')
+def volumes():
+    """Command for volumes"""
+@cli.group('instances')
 def instances():
     """Command for instances"""
 @instances.command('list')
@@ -57,4 +65,4 @@ def start_instances(project):
     return
 
 if __name__ == '__main__':
-    instances()
+    cli()

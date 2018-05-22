@@ -15,6 +15,18 @@ def filter_instances(project):
 
     return instances
 
+def filter_volumes(project):
+
+    volumes = []
+
+    if project:
+        filters = [{'Name':'tag:Project','Values':[project]}]
+        volumes = ec2.volumes.filter(Filters=filters)
+    else:
+        volumes = ec2.volumes.all()
+
+    return volumes
+
 @click.group()
 def cli():
     """Program that manage AWS Account!"""
@@ -25,6 +37,7 @@ def volumes():
 @cli.group('instances')
 def instances():
     """Command for instances"""
+
 @instances.command('list')
 @click.option('--project',default=None, help="only instances for project(tag Project:<name>)")
 def list_instances(project):
@@ -40,6 +53,7 @@ def list_instances(project):
             i.state['Name'],
             i.public_dns_name
             )))
+
     return
 
 @instances.command('stop')
@@ -62,6 +76,18 @@ def start_instances(project):
     for i in instances:
         print("Starting {0}...".format(i.id))
         i.start()
+    return
+
+@volumes.command('list_volumes')
+@click.option('--project',default=None,help="only to see project volumes")
+def list_volumes(project):
+    "List EC2 Volumes by projects (TAG)"
+    volumes = filter_volumes(project)
+    instances = filter_instances(project)
+    for i in instances:
+        for v in volumes:
+            print(v)
+        print(i)
     return
 
 if __name__ == '__main__':
